@@ -418,21 +418,11 @@ int do_avb_write_pvalue(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_FAILURE;
 }
 
-static struct cmd_tbl cmd_avb[] = {
-	U_BOOT_CMD_MKENT(init, 2, 0, do_avb_init, "", ""),
-	U_BOOT_CMD_MKENT(read_rb, 2, 0, do_avb_read_rb, "", ""),
-	U_BOOT_CMD_MKENT(write_rb, 3, 0, do_avb_write_rb, "", ""),
-	U_BOOT_CMD_MKENT(is_unlocked, 1, 0, do_avb_is_unlocked, "", ""),
-	U_BOOT_CMD_MKENT(get_uuid, 2, 0, do_avb_get_uuid, "", ""),
-	U_BOOT_CMD_MKENT(read_part, 5, 0, do_avb_read_part, "", ""),
-	U_BOOT_CMD_MKENT(read_part_hex, 4, 0, do_avb_read_part_hex, "", ""),
-	U_BOOT_CMD_MKENT(write_part, 5, 0, do_avb_write_part, "", ""),
-	U_BOOT_CMD_MKENT(verify, 2, 0, do_avb_verify_part, "", ""),
+static struct cmd_tbl cmd_avb[9
 #ifdef CONFIG_OPTEE_TA_AVB
-	U_BOOT_CMD_MKENT(read_pvalue, 3, 0, do_avb_read_pvalue, "", ""),
-	U_BOOT_CMD_MKENT(write_pvalue, 3, 0, do_avb_write_pvalue, "", ""),
++ 2
 #endif
-};
+];
 
 static int do_avb(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 {
@@ -474,3 +464,19 @@ U_BOOT_CMD(
 	"    from vbmeta structure\n"
 	"    [slot_suffix] - _a, _b, etc (if vbmeta partition is slotted)\n"
 	);
+
+static struct cmd_tbl cmd_avb[] = {
+	U_BOOT_SUBCMD_MKENT(init, 2, 0, do_avb_init),
+	U_BOOT_SUBCMD_MKENT(read_rb, 2, 0, do_avb_read_rb),
+	U_BOOT_SUBCMD_MKENT(write_rb, 3, 0, do_avb_write_rb),
+	U_BOOT_SUBCMD_MKENT(is_unlocked, 1, 0, do_avb_is_unlocked),
+	U_BOOT_SUBCMD_MKENT(get_uuid, 2, 0, do_avb_get_uuid),
+	U_BOOT_SUBCMD_MKENT(read_part, 5, 0, do_avb_read_part),
+	U_BOOT_SUBCMD_MKENT(read_part_hex, 4, 0, do_avb_read_part_hex),
+	U_BOOT_SUBCMD_MKENT(write_part, 5, 0, do_avb_write_part),
+	U_BOOT_SUBCMD_MKENT(verify, 2, 0, do_avb_verify_part),
+#ifdef CONFIG_OPTEE_TA_AVB
+	U_BOOT_SUBCMD_MKENT(read_pvalue, 3, 0, do_avb_read_pvalue),
+	U_BOOT_SUBCMD_MKENT(write_pvalue, 3, 0, do_avb_write_pvalue),
+#endif
+};
