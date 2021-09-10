@@ -158,9 +158,6 @@ int do_avb_read_rb(struct cmd_tbl *cmdtp, int flag, int argc,
 		return CMD_RET_FAILURE;
 	}
 
-	if (argc != 2)
-		return CMD_RET_USAGE;
-
 	index = (size_t)hextoul(argv[1], NULL);
 
 	if (avb_ops->read_rollback_index(avb_ops, index, &rb_idx) ==
@@ -211,9 +208,6 @@ int do_avb_get_uuid(struct cmd_tbl *cmdtp, int flag,
 		return CMD_RET_FAILURE;
 	}
 
-	if (argc != 2)
-		return CMD_RET_USAGE;
-
 	part = argv[1];
 
 	if (avb_ops->get_unique_guid_for_partition(avb_ops, part, buffer,
@@ -245,9 +239,6 @@ int do_avb_verify_part(struct cmd_tbl *cmdtp, int flag,
 		printf("AVB 2.0 is not initialized, run 'avb init' first\n");
 		return CMD_RET_FAILURE;
 	}
-
-	if (argc < 1 || argc > 2)
-		return CMD_RET_USAGE;
 
 	if (argc == 2)
 		slot_suffix = argv[1];
@@ -330,11 +321,6 @@ int do_avb_is_unlocked(struct cmd_tbl *cmdtp, int flag,
 	if (!avb_ops) {
 		printf("AVB not initialized, run 'avb init' first\n");
 		return CMD_RET_FAILURE;
-	}
-
-	if (argc != 1) {
-		printf("--%s(-1)\n", __func__);
-		return CMD_RET_USAGE;
 	}
 
 	if (avb_ops->read_is_device_unlocked(avb_ops, &unlock) ==
