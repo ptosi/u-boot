@@ -418,32 +418,7 @@ int do_avb_write_pvalue(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_FAILURE;
 }
 
-static struct cmd_tbl cmd_avb[9
-#ifdef CONFIG_OPTEE_TA_AVB
-+ 2
-#endif
-];
-
-static int do_avb(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
-{
-	struct cmd_tbl *cp;
-
-	cp = find_cmd_tbl(argv[1], cmd_avb, ARRAY_SIZE(cmd_avb));
-
-	argc--;
-	argv++;
-
-	if (!cp || argc > cp->maxargs)
-		return CMD_RET_USAGE;
-
-	if (flag == CMD_FLAG_REPEAT)
-		return CMD_RET_FAILURE;
-
-	return cp->cmd(cmdtp, flag, argc, argv);
-}
-
-U_BOOT_CMD(
-	avb, 29, 0, do_avb,
+U_BOOT_CMD_WITH_SUBCMDS(avb,
 	"Provides commands for testing Android Verified Boot 2.0 functionality",
 	"init <dev> - initialize avb2 for <dev>\n"
 	"avb read_rb <num> - read rollback index at location <num>\n"
@@ -463,9 +438,7 @@ U_BOOT_CMD(
 	"avb verify [slot_suffix] - run verification process using hash data\n"
 	"    from vbmeta structure\n"
 	"    [slot_suffix] - _a, _b, etc (if vbmeta partition is slotted)\n"
-	);
-
-static struct cmd_tbl cmd_avb[] = {
+	,
 	U_BOOT_SUBCMD_MKENT(init, 2, 0, do_avb_init),
 	U_BOOT_SUBCMD_MKENT(read_rb, 2, 0, do_avb_read_rb),
 	U_BOOT_SUBCMD_MKENT(write_rb, 3, 0, do_avb_write_rb),
@@ -479,4 +452,4 @@ static struct cmd_tbl cmd_avb[] = {
 	U_BOOT_SUBCMD_MKENT(read_pvalue, 3, 0, do_avb_read_pvalue),
 	U_BOOT_SUBCMD_MKENT(write_pvalue, 3, 0, do_avb_write_pvalue),
 #endif
-};
+);
