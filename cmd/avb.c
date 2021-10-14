@@ -158,9 +158,6 @@ int do_avb_read_rb(struct cmd_tbl *cmdtp, int flag, int argc,
 		return CMD_RET_FAILURE;
 	}
 
-	if (argc != 2)
-		return CMD_RET_USAGE;
-
 	index = (size_t)hextoul(argv[1], NULL);
 
 	if (avb_ops->read_rollback_index(avb_ops, index, &rb_idx) ==
@@ -211,9 +208,6 @@ int do_avb_get_uuid(struct cmd_tbl *cmdtp, int flag,
 		return CMD_RET_FAILURE;
 	}
 
-	if (argc != 2)
-		return CMD_RET_USAGE;
-
 	part = argv[1];
 
 	if (avb_ops->get_unique_guid_for_partition(avb_ops, part, buffer,
@@ -245,9 +239,6 @@ int do_avb_verify_part(struct cmd_tbl *cmdtp, int flag,
 		printf("AVB 2.0 is not initialized, run 'avb init' first\n");
 		return CMD_RET_FAILURE;
 	}
-
-	if (argc < 1 || argc > 2)
-		return CMD_RET_USAGE;
 
 	if (argc == 2)
 		slot_suffix = argv[1];
@@ -332,11 +323,6 @@ int do_avb_is_unlocked(struct cmd_tbl *cmdtp, int flag,
 		return CMD_RET_FAILURE;
 	}
 
-	if (argc != 1) {
-		printf("--%s(-1)\n", __func__);
-		return CMD_RET_USAGE;
-	}
-
 	if (avb_ops->read_is_device_unlocked(avb_ops, &unlock) ==
 	    AVB_IO_RESULT_OK) {
 		printf("Unlocked = %d\n", unlock);
@@ -418,42 +404,7 @@ int do_avb_write_pvalue(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_FAILURE;
 }
 
-static struct cmd_tbl cmd_avb[] = {
-	U_BOOT_CMD_MKENT(init, 2, 0, do_avb_init, "", ""),
-	U_BOOT_CMD_MKENT(read_rb, 2, 0, do_avb_read_rb, "", ""),
-	U_BOOT_CMD_MKENT(write_rb, 3, 0, do_avb_write_rb, "", ""),
-	U_BOOT_CMD_MKENT(is_unlocked, 1, 0, do_avb_is_unlocked, "", ""),
-	U_BOOT_CMD_MKENT(get_uuid, 2, 0, do_avb_get_uuid, "", ""),
-	U_BOOT_CMD_MKENT(read_part, 5, 0, do_avb_read_part, "", ""),
-	U_BOOT_CMD_MKENT(read_part_hex, 4, 0, do_avb_read_part_hex, "", ""),
-	U_BOOT_CMD_MKENT(write_part, 5, 0, do_avb_write_part, "", ""),
-	U_BOOT_CMD_MKENT(verify, 2, 0, do_avb_verify_part, "", ""),
-#ifdef CONFIG_OPTEE_TA_AVB
-	U_BOOT_CMD_MKENT(read_pvalue, 3, 0, do_avb_read_pvalue, "", ""),
-	U_BOOT_CMD_MKENT(write_pvalue, 3, 0, do_avb_write_pvalue, "", ""),
-#endif
-};
-
-static int do_avb(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
-{
-	struct cmd_tbl *cp;
-
-	cp = find_cmd_tbl(argv[1], cmd_avb, ARRAY_SIZE(cmd_avb));
-
-	argc--;
-	argv++;
-
-	if (!cp || argc > cp->maxargs)
-		return CMD_RET_USAGE;
-
-	if (flag == CMD_FLAG_REPEAT)
-		return CMD_RET_FAILURE;
-
-	return cp->cmd(cmdtp, flag, argc, argv);
-}
-
-U_BOOT_CMD(
-	avb, 29, 0, do_avb,
+U_BOOT_CMD_WITH_SUBCMDS(avb,
 	"Provides commands for testing Android Verified Boot 2.0 functionality",
 	"init <dev> - initialize avb2 for <dev>\n"
 	"avb read_rb <num> - read rollback index at location <num>\n"
@@ -473,4 +424,18 @@ U_BOOT_CMD(
 	"avb verify [slot_suffix] - run verification process using hash data\n"
 	"    from vbmeta structure\n"
 	"    [slot_suffix] - _a, _b, etc (if vbmeta partition is slotted)\n"
-	);
+	,
+	U_BOOT_SUBCMD_MKENT(init, 2, 0, do_avb_init),
+	U_BOOT_SUBCMD_MKENT(read_rb, 2, 0, do_avb_read_rb),
+	U_BOOT_SUBCMD_MKENT(write_rb, 3, 0, do_avb_write_rb),
+	U_BOOT_SUBCMD_MKENT(is_unlocked, 1, 0, do_avb_is_unlocked),
+	U_BOOT_SUBCMD_MKENT(get_uuid, 2, 0, do_avb_get_uuid),
+	U_BOOT_SUBCMD_MKENT(read_part, 5, 0, do_avb_read_part),
+	U_BOOT_SUBCMD_MKENT(read_part_hex, 4, 0, do_avb_read_part_hex),
+	U_BOOT_SUBCMD_MKENT(write_part, 5, 0, do_avb_write_part),
+	U_BOOT_SUBCMD_MKENT(verify, 2, 0, do_avb_verify_part),
+#ifdef CONFIG_OPTEE_TA_AVB
+	U_BOOT_SUBCMD_MKENT(read_pvalue, 3, 0, do_avb_read_pvalue),
+	U_BOOT_SUBCMD_MKENT(write_pvalue, 3, 0, do_avb_write_pvalue),
+#endif
+);
